@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>School Pickup System</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c1829;--card:#132038;--card2:#1a2d4e;--surface:#091322;
+  --border:rgba(70,110,190,.2);--text:#dceeff;--dim:#5a7aa8;
+  --blue:#3b82f6;--green:#10b981;--orange:#f97316;
+  --red:#ef4444;--purple:#8b5cf6;--teal:#14b8a6;
+  --gb:linear-gradient(135deg,#1e40af,#3b82f6);
+  --gg:linear-gradient(135deg,#065f46,#10b981);
+  --go:linear-gradient(135deg,#9a3412,#f97316);
+  --gr:linear-gradient(135deg,#991b1b,#ef4444);
+  --gp:linear-gradient(135deg,#4c1d95,#8b5cf6);
+  --gt:linear-gradient(135deg,#134e4a,#14b8a6);
+  --gn:linear-gradient(135deg,#0f1e3d,#1e3a8a);
+}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(12,24,41,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+#topbar.off{display:none}
+.tb-mid{font-size:16px;font-weight:800}
+.tb-btn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:none;background:rgba(255,255,255,.07);border-radius:10px;color:var(--text);cursor:pointer}
+.tb-btn:hover{background:rgba(255,255,255,.14)}
+.tb-btn.hide{visibility:hidden;pointer-events:none}
+
+/* SCREENS — simple show/hide */
+.screen{display:none;min-height:calc(100vh - 60px);padding:76px 20px 32px}
+.screen.active{display:block}
+#S-home{padding:0;min-height:100vh}
+
+/* HOME */
+.home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center;padding:24px;position:relative}
+.corner{position:absolute;top:20px}
+.corner.L{left:20px}.corner.R{right:20px}
+
+.pill{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:999px;border:none;font-size:13px;font-weight:800;cursor:pointer;font-family:'Manrope',sans-serif}
+.pill-g{background:var(--gg);color:#fff;box-shadow:0 4px 16px rgba(16,185,129,.3)}
+.pill-n{background:rgba(255,255,255,.09);color:#fff;border:1px solid rgba(255,255,255,.14)}
+.pill:hover{transform:translateY(-2px)}
+
+.logo{width:148px;height:148px;border-radius:50%;background:var(--gb);display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(59,130,246,.3),0 0 100px rgba(59,130,246,.1);animation:float 3.5s ease-in-out infinite;position:relative}
+.logo-ring{position:absolute;inset:-14px;border-radius:50%;border:2px solid rgba(59,130,246,.2);animation:rp 2.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes rp{0%,100%{transform:scale(1);opacity:.45}50%{transform:scale(1.07);opacity:.12}}
+
+.h1{font-size:36px;font-weight:900;line-height:1.1;background:linear-gradient(135deg,#fff,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.h-sub{color:var(--dim);font-size:14px;font-weight:700;letter-spacing:.05em}
+
+.big-btn{display:flex;align-items:center;gap:16px;width:min(480px,90vw);background:var(--gb);border:none;border-radius:20px;padding:22px 26px;cursor:pointer;color:#fff;box-shadow:0 0 36px rgba(59,130,246,.2),0 14px 36px rgba(0,0,0,.4);transition:.28s;font-family:'Manrope',sans-serif}
+.big-btn:hover{transform:translateY(-4px);box-shadow:0 0 54px rgba(59,130,246,.3),0 22px 54px rgba(0,0,0,.5)}
+.bb-icon{width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bb-text{flex:1;text-align:left}
+.bb-title{font-size:20px;font-weight:900}
+.bb-sub{font-size:13px;opacity:.82;margin-top:3px}
+
+/* PAGE WRAPPER */
+.page{max-width:1100px;margin:0 auto;padding-bottom:40px}
+.narrow{max-width:580px;margin:0 auto;padding-bottom:40px}
+.ptitle{font-size:25px;font-weight:900;margin-bottom:22px;background:linear-gradient(135deg,#dceeff,#5a7aa8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.row-sb{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+
+/* AUTH CENTRE */
+.auth{display:flex;flex-direction:column;align-items:center;gap:16px;max-width:500px;margin:0 auto;text-align:center}
+.auth h2{font-size:26px;font-weight:900}
+.auth .dim{color:var(--dim);font-size:14px}
+.auth-icon{width:108px;height:108px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.ai-n{background:var(--gn);box-shadow:0 0 40px rgba(30,58,138,.3)}
+.ai-g{background:var(--gg);box-shadow:0 0 40px rgba(16,185,129,.25)}
+.ai-b{background:var(--gb);box-shadow:0 0 40px rgba(59,130,246,.25)}
+.ai-p{background:var(--gp);box-shadow:0 0 40px rgba(139,92,246,.25)}
+.hint{font-size:12px;color:var(--dim);line-height:1.7;text-align:center}
+
+/* FORM */
+.form{width:100%;background:var(--card);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px;border:1px solid var(--border);box-shadow:0 16px 40px rgba(0,0,0,.35)}
+.field{display:flex;flex-direction:column;gap:7px;font-size:11px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:.07em}
+input{padding:13px 15px;border-radius:11px;border:2px solid var(--border);background:var(--surface);color:var(--text);font-family:'Manrope',sans-serif;font-size:15px;outline:none;transition:.18s;width:100%}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+input::placeholder{color:rgba(90,122,168,.5)}
+.pw{display:flex;gap:8px;align-items:center}
+.pw input{flex:1}
+.eye{width:46px;height:46px;flex-shrink:0;border-radius:11px;border:2px solid var(--border);background:var(--surface);color:var(--dim);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.eye:hover{background:var(--card2)}
+.fsec{font-size:11px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;padding-top:4px;border-top:1px solid var(--border)}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:800;color:#fff;cursor:pointer;font-family:'Manrope',sans-serif;transition:.22s}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:scale(.98)}
+.btn-n{background:var(--gn)}
+.btn-b{background:var(--gb);box-shadow:0 5px 18px rgba(59,130,246,.22)}
+.btn-g{background:var(--gg);box-shadow:0 5px 18px rgba(16,185,129,.22)}
+.btn-p{background:var(--gp);box-shadow:0 5px 18px rgba(139,92,246,.22)}
+.btn-t{background:var(--gt);box-shadow:0 5px 18px rgba(20,184,166,.22)}
+.btn-o{background:var(--go);box-shadow:0 5px 18px rgba(249,115,22,.22)}
+.sm-btn{padding:9px 16px;border-radius:10px;border:none;background:var(--gg);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:'Manrope',sans-serif;white-space:nowrap}
+.sm-btn:hover{transform:translateY(-1px)}
+
+/* DASH GRID */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.dcard{display:flex;flex-direction:column;align-items:center;gap:12px;padding:28px 18px;background:var(--card);border-radius:16px;border:1px solid var(--border);cursor:pointer;transition:.26s;box-shadow:0 10px 26px rgba(0,0,0,.28)}
+.dcard:hover{transform:translateY(-5px);box-shadow:0 18px 44px rgba(0,0,0,.4)}
+.d-icon{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center}
+.dc-p .d-icon{background:var(--gp);box-shadow:0 5px 18px rgba(139,92,246,.28)}
+.dc-b .d-icon{background:var(--gb);box-shadow:0 5px 18px rgba(59,130,246,.28)}
+.dc-g .d-icon{background:var(--gg);box-shadow:0 5px 18px rgba(16,185,129,.28)}
+.dc-t .d-icon{background:var(--gt);box-shadow:0 5px 18px rgba(20,184,166,.28)}
+.dc-o .d-icon{background:var(--go);box-shadow:0 5px 18px rgba(249,115,22,.28)}
+.d-label{font-size:15px;font-weight:900}
+.d-sub{font-size:12px;color:var(--dim);text-align:center}
+
+/* HERO BAR */
+.hero{display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:16px;margin-bottom:20px;overflow:hidden;position:relative}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent);pointer-events:none}
+.h-g{background:var(--gg);box-shadow:0 6px 24px rgba(16,185,129,.22)}
+.hero-title{font-size:17px;font-weight:900;color:#fff}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.78);margin-top:2px}
+
+/* LIST */
+.list{display:flex;flex-direction:column;gap:11px}
+.li{background:var(--card);border-radius:14px;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--border);cursor:pointer;transition:.18s;box-shadow:0 5px 15px rgba(0,0,0,.22)}
+.li:hover{transform:translateX(4px);border-color:rgba(90,140,220,.32)}
+.li-title{font-weight:900;font-size:15px}
+.li-sub{font-size:12px;color:var(--dim);margin-top:2px}
+.bubble{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;color:#fff;flex-shrink:0}
+.b-g{background:var(--gg)}.b-b{background:var(--gb)}
+
+/* CLASSROOM SPLIT */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;min-height:calc(100vh - 90px)}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+.panel{background:var(--card);border-radius:16px;border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;height:calc(100vh - 100px)}
+.panel-head{display:flex;align-items:center;gap:14px;padding:16px 20px;flex-shrink:0;position:relative;overflow:hidden}
+.panel-head::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.09),transparent);pointer-events:none}
+.ph-b{background:var(--gb)}.ph-o{background:var(--go)}
+.ph-title{font-size:16px;font-weight:900;color:#fff}
+.ph-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px}
+.panel-body{flex:1;overflow-y:auto;padding:14px}
+.panel-body::-webkit-scrollbar{width:4px}
+.panel-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:10px}
+
+/* STUDENT ROW in classroom */
+.stu{display:flex;align-items:center;gap:13px;padding:12px 14px;background:var(--surface);border-radius:12px;margin-bottom:10px;border:1px solid var(--border);transition:.18s}
+.stu:hover{transform:translateX(3px)}
+.stu-pic{width:56px;height:56px;border-radius:50%;background:var(--card2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.stu-name{font-weight:800;font-size:14px}
+.stu-sub{font-size:12px;color:var(--dim);margin-top:2px}
+.badge{padding:5px 11px;border-radius:999px;font-size:11px;font-weight:800;flex-shrink:0}
+.b-pres{background:rgba(16,185,129,.18);color:#34d399}
+.b-abs{background:rgba(239,68,68,.18);color:#f87171}
+
+/* REQUEST CARD */
+.req{background:var(--surface);border-radius:14px;padding:15px;border:2px solid rgba(249,115,22,.38);margin-bottom:11px}
+.req-top{display:flex;justify-content:space-between;margin-bottom:11px}
+.req-tag{font-size:10px;font-weight:900;color:var(--orange);text-transform:uppercase;letter-spacing:.1em}
+.req-time{font-size:11px;color:var(--dim)}
+.req-mid{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.req-av{width:44px;height:44px;border-radius:50%;background:var(--go);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.req-sn{font-weight:900;font-size:15px}
+.req-pn{font-size:12px;color:var(--dim);margin-top:2px}
+.req-btns{display:flex;gap:9px}
+.rb{flex:1;padding:10px;border-radius:10px;border:none;font-weight:900;font-size:13px;cursor:pointer;color:#fff;font-family:'Manrope',sans-serif;transition:.18s}
+.rb:hover{transform:translateY(-1px)}
+.rb-a{background:var(--gg);box-shadow:0 3px 12px rgba(16,185,129,.22)}
+.rb-r{background:var(--gr);box-shadow:0 3px 12px rgba(239,68,68,.22)}
+
+/* EMPTY STATE */
+.empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:44px 18px;text-align:center;color:var(--dim)}
+.empty svg{opacity:.18}
+.empty-t{font-weight:900;font-size:15px}
+.empty-s{font-size:13px}
+
+/* VERIFY BUTTONS */
+.vbtn{width:100%;display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:18px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--text);transition:.25s;font-family:'Manrope',sans-serif;text-align:left}
+.vbtn:hover{transform:translateX(6px)}
+.vbtn.vb-b{border-color:rgba(59,130,246,.32)}
+.vbtn.vb-o{border-color:rgba(249,115,22,.32)}
+.vbtn.vb-b:hover{box-shadow:0 0 26px rgba(59,130,246,.15)}
+.vbtn.vb-o:hover{box-shadow:0 0 26px rgba(249,115,22,.15)}
+.v-ico{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vi-b{background:rgba(59,130,246,.14)}.vi-o{background:rgba(249,115,22,.14)}
+.v-txt{flex:1}
+.v-title{font-size:17px;font-weight:900}
+.v-sub{font-size:13px;color:var(--dim);margin-top:3px}
+.or-line{display:flex;align-items:center;gap:13px;color:var(--dim);font-size:13px;font-weight:700;width:100%}
+.or-line::before,.or-line::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* PARENT BAR */
+.pbar{display:flex;align-items:center;gap:16px;background:var(--card);border-radius:16px;padding:18px 20px;margin-bottom:22px;border:1px solid var(--border);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.pbar-emo{font-size:50px;line-height:1;flex-shrink:0}
+.pbar-name{font-size:20px;font-weight:900}
+.pbar-badge{display:inline-block;margin-top:5px;padding:4px 11px;border-radius:999px;background:rgba(16,185,129,.18);color:#34d399;font-size:12px;font-weight:800}
+.sec-lbl{font-size:11px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:.09em;margin-bottom:13px}
+
+/* PICKUP CARDS */
+.pkcard{display:flex;align-items:center;gap:15px;background:var(--card);border-radius:16px;padding:16px 18px;border:2px solid transparent;cursor:pointer;transition:.22s;box-shadow:0 5px 18px rgba(0,0,0,.22);margin-bottom:13px}
+.pkcard:hover{transform:translateX(4px)}
+.pkcard.sel{border-color:var(--green);background:var(--card2)}
+.pk-photo{width:68px;height:68px;border-radius:50%;background:var(--card2);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:34px;flex-shrink:0;transition:.22s}
+.pkcard.sel .pk-photo{border-color:var(--green)}
+.pk-info{flex:1}
+.pk-name{font-size:18px;font-weight:900}
+.pk-grade{font-size:13px;color:var(--dim);margin-top:3px}
+.pk-check{width:32px;height:32px;border-radius:50%;border:3px solid var(--border);display:flex;align-items:center;justify-content:center;transition:.22s;flex-shrink:0}
+.pkcard.sel .pk-check{background:var(--green);border-color:var(--green)}
+
+/* PHOTO BOXES */
+.photo-row{display:flex;gap:12px;margin-bottom:18px}
+.pbox{flex:1;height:120px;border-radius:14px;background:var(--surface);border:2px dashed rgba(90,120,190,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;color:var(--dim);font-size:12px;font-weight:700;transition:.18s}
+.pbox:hover{background:var(--card)}
+.pbox.pb-g{border-color:rgba(16,185,129,.35)}
+.pbox.pb-b{border-color:rgba(59,130,246,.35)}
+.pbox.done{background:var(--card2);border-style:solid}
+.pcircle{width:120px;height:120px;border-radius:50%;background:var(--surface);border:2px dashed rgba(139,92,246,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;cursor:pointer;color:var(--dim);font-size:12px;font-weight:700;margin:0 auto 14px;transition:.18s}
+.pcircle:hover{background:var(--card)}
+.qr-ok{font-size:12px;font-weight:700;color:var(--green);text-align:center;min-height:16px;margin-top:2px}
+.cbadge{padding:6px 13px;border-radius:999px;background:rgba(16,185,129,.13);color:var(--green);font-size:12px;font-weight:800}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:999;background:var(--card2);color:var(--text);padding:12px 22px;border-radius:12px;font-weight:700;font-size:14px;border:1px solid var(--border);box-shadow:0 16px 44px rgba(0,0,0,.5);backdrop-filter:blur(16px);white-space:nowrap;transition:opacity .25s;pointer-events:none}
+#toast.off{opacity:0}
+
+/* MODAL */
+#modal{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
+#modal.off{display:none}
+.m-bg{position:absolute;inset:0;background:rgba(5,12,28,.88);backdrop-filter:blur(10px)}
+.m-box{position:relative;z-index:1;width:min(480px,96vw);background:var(--card);border-radius:16px;padding:24px;border:1px solid var(--border);box-shadow:0 28px 70px rgba(0,0,0,.55)}
+.m-title{font-weight:900;font-size:18px;margin-bottom:11px}
+.m-body{color:var(--dim);line-height:1.6;margin-bottom:20px}
+.m-foot{display:flex;justify-content:flex-end;gap:9px}
+.m-foot button{padding:9px 17px;border-radius:10px;border:none;font-weight:800;cursor:pointer;background:rgba(255,255,255,.09);color:var(--text);font-family:'Manrope',sans-serif}
+.m-foot button:hover{background:rgba(255,255,255,.16)}
+
+@media(max-width:640px){.h1{font-size:28px}.dash-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.dash-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar" class="off">
+  <button class="tb-btn" id="btnBack">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </button>
+  <div class="tb-mid" id="tbTitle"></div>
+  <button class="tb-btn" id="btnOut">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+  </button>
+</div>
+
+<!-- ██ HOME ██ -->
+<div class="screen active" id="S-home">
+  <div class="home">
+    <div class="corner L">
+      <button class="pill pill-g" onclick="go('S-cls-login')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Classroom
+      </button>
+    </div>
+    <div class="corner R">
+      <button class="pill pill-n" onclick="go('S-login')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Staff Login
+      </button>
+    </div>
+    <div class="logo">
+      <svg width="58" height="58" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <div class="logo-ring"></div>
+    </div>
+    <div class="h1">School Pickup<br>System</div>
+    <div class="h-sub">SAFE · FAST · VERIFIED</div>
+    <button class="big-btn" onclick="go('S-verify')">
+      <div class="bb-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="bb-text">
+        <div class="bb-title">Parent Pickup</div>
+        <div class="bb-sub">Request to pick up your child</div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ██ STAFF LOGIN ██ -->
+<div class="screen" id="S-login">
+  <div class="auth">
+    <div class="auth-icon ai-n">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <h2>Staff Login</h2>
+    <div class="dim">Admin &amp; Reception access</div>
+    <div class="form" style="width:100%">
+      <label class="field">Username
+        <input id="su" placeholder="Enter username" autocomplete="username"/>
+      </label>
+      <label class="field">Password
+        <div class="pw">
+          <input id="sp" type="password" placeholder="Enter password" autocomplete="current-password"/>
+          <button class="eye" id="sp-eye" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </label>
+      <button class="btn btn-n" id="btn-slogin">Sign In
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div class="hint">Admin: <b>admin</b> / <b>admin123</b><br>Reception: <b>reception</b> / <b>reception123</b></div>
+  </div>
+</div>
+
+<!-- ██ ADMIN DASHBOARD ██ -->
+<div class="screen" id="S-admin">
+  <div class="page">
+    <div class="ptitle">Admin Dashboard</div>
+    <div class="dash-grid">
+      <button class="dcard dc-p" onclick="go('S-addteacher')">
+        <div class="d-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="d-label">Add Teacher</div><div class="d-sub">Register new staff</div>
+      </button>
+      <button class="dcard dc-b" onclick="go('S-teachers')">
+        <div class="d-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+        <div class="d-label">View Teachers</div><div class="d-sub">All staff</div>
+      </button>
+      <button class="dcard dc-g" onclick="go('S-classes')">
+        <div class="d-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="d-label">Manage Classes</div><div class="d-sub">Classrooms</div>
+      </button>
+      <button class="dcard dc-t" onclick="go('S-students')">
+        <div class="d-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+        <div class="d-label">All Students</div><div class="d-sub">View &amp; manage</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ██ RECEPTION DASHBOARD ██ -->
+<div class="screen" id="S-reception">
+  <div class="page">
+    <div class="ptitle">Reception Dashboard</div>
+    <div class="dash-grid">
+      <button class="dcard dc-g" onclick="go('S-addstudent')">
+        <div class="d-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="d-label">Add Student</div><div class="d-sub">Register new</div>
+      </button>
+      <button class="dcard dc-b" onclick="go('S-students')">
+        <div class="d-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+        <div class="d-label">View Students</div><div class="d-sub">Browse all</div>
+      </button>
+      <button class="dcard dc-p" onclick="go('S-editstu')">
+        <div class="d-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="d-label">Edit Student</div><div class="d-sub">Update info</div>
+      </button>
+      <button class="dcard dc-o" id="btnPrintQr">
+        <div class="d-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></div>
+        <div class="d-label">Print QR Codes</div><div class="d-sub">All students</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ██ CLASSROOM LOGIN ██ -->
+<div class="screen" id="S-cls-login">
+  <div class="auth">
+    <div class="auth-icon ai-g">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <h2>Classroom Login</h2>
+    <div class="dim">Enter your teacher credentials</div>
+    <div class="form" style="width:100%">
+      <label class="field">Username
+        <input id="cu" placeholder="Teacher username" autocomplete="username"/>
+      </label>
+      <label class="field">Password
+        <div class="pw">
+          <input id="cp" type="password" placeholder="Password" autocomplete="current-password"/>
+          <button class="eye" id="cp-eye" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </label>
+      <button class="btn btn-g" id="btn-clogin">Enter Classroom
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div class="hint">ahmed123 / teacher123 &nbsp;|&nbsp; sarah456 / teacher123 &nbsp;|&nbsp; fatima789 / teacher123</div>
+  </div>
+</div>
+
+<!-- ██ CLASSROOM SELECT ██ -->
+<div class="screen" id="S-cls-select">
+  <div class="page">
+    <div class="hero h-g">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <div>
+        <div class="hero-title" id="welcomeMsg">Welcome!</div>
+        <div class="hero-sub">Select your classroom below</div>
+      </div>
+    </div>
+    <div class="list" id="clsList"></div>
+  </div>
+</div>
+
+<!-- ██ CLASSROOM DEVICE ██ -->
+<div class="screen" id="S-cls-device">
+  <div class="split">
+    <div class="panel">
+      <div class="panel-head ph-b">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div><div class="ph-title">Students</div><div class="ph-sub" id="stuCount">0 students</div></div>
+      </div>
+      <div class="panel-body" id="stuList"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head ph-o">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div><div class="ph-title">Pickup Requests</div><div class="ph-sub" id="reqCount">0 pending</div></div>
+      </div>
+      <div class="panel-body" id="reqList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ██ PARENT VERIFY ██ -->
+<div class="screen" id="S-verify">
+  <div class="auth">
+    <div class="auth-icon ai-b">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+    <h2>Verify Identity</h2>
+    <div class="dim">Choose your verification method</div>
+    <button class="vbtn vb-b" id="btn-face">
+      <div class="v-ico vi-b"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1" fill="#3b82f6"/><circle cx="15" cy="9" r="1" fill="#3b82f6"/></svg></div>
+      <div class="v-txt"><div class="v-title">Face Verification</div><div class="v-sub">Scan your face to continue</div></div>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="or-line">or</div>
+    <button class="vbtn vb-o" id="btn-qr">
+      <div class="v-ico vi-o"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></div>
+      <div class="v-txt"><div class="v-title">QR Code Scan</div><div class="v-sub">Use your QR card</div></div>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ██ PARENT PICKUP ██ -->
+<div class="screen" id="S-pickup">
+  <div class="narrow">
+    <div class="pbar">
+      <div class="pbar-emo" id="pEmo">👨</div>
+      <div>
+        <div class="pbar-name" id="pName">Parent Name</div>
+        <div class="pbar-badge" id="pBadge">✓ Verified via Face Scan</div>
+      </div>
+    </div>
+    <div class="sec-lbl">Select children for pickup</div>
+    <div id="pickupCards"></div>
+    <button class="btn btn-g" id="btn-confirm" style="margin-top:22px">
+      Confirm Pickup Request
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ██ ADD TEACHER ██ -->
+<div class="screen" id="S-addteacher">
+  <div class="narrow">
+    <div class="ptitle">Add Teacher</div>
+    <div class="form">
+      <div class="pcircle" id="tPhoto">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span id="tPhotoLbl">Tap to capture</span>
+      </div>
+      <label class="field">Full Name<input id="tName" placeholder="Teacher's full name"/></label>
+      <label class="field">Username<input id="tUser" placeholder="Login username"/></label>
+      <label class="field">Password<input id="tPass" type="password" placeholder="Password"/></label>
+      <button class="btn btn-p" id="btn-saveteacher">Save Teacher
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ██ VIEW TEACHERS ██ -->
+<div class="screen" id="S-teachers">
+  <div class="narrow">
+    <div class="ptitle">All Teachers</div>
+    <div class="list" id="teacherList"></div>
+  </div>
+</div>
+
+<!-- ██ MANAGE CLASSES ██ -->
+<div class="screen" id="S-classes">
+  <div class="page">
+    <div class="row-sb">
+      <div class="ptitle" style="margin:0">Manage Classes</div>
+      <button class="sm-btn" id="btn-addcls">+ Add Class</button>
+    </div>
+    <div class="list" id="clsManage"></div>
+  </div>
+</div>
+
+<!-- ██ ASSIGN STUDENTS ██ -->
+<div class="screen" id="S-assign">
+  <div class="narrow">
+    <div class="row-sb" style="margin-bottom:18px">
+      <div class="ptitle" id="assignTitle" style="margin:0">Assign</div>
+      <div class="cbadge" id="assignCount">0 selected</div>
+    </div>
+    <div class="list" id="assignList"></div>
+    <button class="btn btn-g" id="btn-saveassign" style="margin-top:18px">Save Assignments
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ██ ADD STUDENT ██ -->
+<div class="screen" id="S-addstudent">
+  <div class="narrow">
+    <div class="ptitle">Add New Student</div>
+    <div class="photo-row">
+      <div class="pbox pb-g" id="sPhoto">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="sPhotoLbl">Student Photo</span>
+      </div>
+      <div class="pbox pb-b" id="parPhoto">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        <span id="parPhotoLbl">Parent Photo</span>
+      </div>
+    </div>
+    <div class="form">
+      <div class="fsec">Student Info</div>
+      <label class="field">Student Name<input id="stN" placeholder="Full name"/></label>
+      <label class="field">Grade<input id="stG" placeholder="e.g. Grade 5"/></label>
+      <label class="field">Student ID<input id="stI" placeholder="Unique ID"/></label>
+      <div class="fsec">Parent Info</div>
+      <label class="field">Father's Name<input id="stF" placeholder="Full name"/></label>
+      <label class="field">Mother's Name<input id="stM" placeholder="Full name"/></label>
+      <div class="fsec">QR Code</div>
+      <button class="btn btn-t" id="btn-genqr">Generate QR Code</button>
+      <div class="qr-ok" id="qrStatus"></div>
+      <button class="btn btn-g" id="btn-savestu">Save Student
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ██ VIEW STUDENTS ██ -->
+<div class="screen" id="S-students">
+  <div class="page">
+    <div class="ptitle">All Students</div>
+    <div class="list" id="stuAllList"></div>
+  </div>
+</div>
+
+<!-- ██ EDIT STUDENT ██ -->
+<div class="screen" id="S-editstu">
+  <div class="auth">
+    <div class="auth-icon ai-p">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+    </div>
+    <h2>Find Student</h2>
+    <div class="dim">Scan QR code or verify face</div>
+    <button class="btn btn-p" id="btn-scanqr">Scan QR Code</button>
+    <button class="btn btn-b" id="btn-faceedit" style="margin-top:11px">Face Verification</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="off"></div>
+
+<!-- MODAL -->
+<div id="modal" class="off">
+  <div class="m-bg" id="mBg"></div>
+  <div class="m-box">
+    <div class="m-title" id="mTitle"></div>
+    <div class="m-body" id="mBody"></div>
+    <div class="m-foot" id="mFoot"></div>
+  </div>
+</div>
+
+<script type="module">
+// ═══════════════════════════════════════════════════════
+//  SUPABASE CONNECTION
+// ═══════════════════════════════════════════════════════
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
+  'https://zjnmcdyysttwivmzbvfb.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpqbm1jZHl5c3R0d2l2bXpidmZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMzk0ODksImV4cCI6MjA4NjkxNTQ4OX0.4r7YGOR_wuZobLfeOF9Red-NHq7ONUSf9AKnNXo8qYs'
+)
+
+// ═══════════════════════════════════════════════════════
+//  DATA (Demo + Database)
+// ═══════════════════════════════════════════════════════
+const STAFF = {
+  admin:     { pw:'admin123',     role:'admin',     label:'Administrator' },
+  reception: { pw:'reception123', role:'reception', label:'Receptionist' },
+};
+const TEACHERS = {
+  // Start empty - add teachers via the app
+  // Will be loaded from localStorage on startup
+};
+
+// Load teacher credentials from localStorage
+const TEACHER_CREDS_KEY = 'sps_teacher_creds';
+function loadTeacherCredentials() {
+  try {
+    const saved = localStorage.getItem(TEACHER_CREDS_KEY);
+    if (saved) {
+      const creds = JSON.parse(saved);
+      Object.assign(TEACHERS, creds);
+      console.log('✅ Loaded', Object.keys(TEACHERS).length, 'teacher credentials from storage');
+    }
+  } catch (err) {
+    console.warn('Failed to load teacher credentials:', err);
+  }
+}
+
+function saveTeacherCredentials() {
+  try {
+    localStorage.setItem(TEACHER_CREDS_KEY, JSON.stringify(TEACHERS));
+    console.log('💾 Saved teacher credentials to storage');
+  } catch (err) {
+    console.warn('Failed to save teacher credentials:', err);
+  }
+}
+
+// Load on startup
+loadTeacherCredentials();
+const STUDENTS = [
+  // Start empty - add students via the app
+];
+const CLASS_STUDENTS = {
+  'Class A': [],
+  'Class B': [],
+  'Class C': [],
+  'Class D': [],
+  'Class E': [],
+};
+const PARENTS = {
+  P1:{ name:'Mr. Ali',       emo:'👨', kids:['001','002'] }, // Demo parent for testing
+  P2:{ name:'Mrs. Johnson',  emo:'👩', kids:['003'] },
+  P3:{ name:'Mr. Smith',     emo:'👨', kids:['004'] },
+  P4:{ name:'Mrs. Wilson',   emo:'👩', kids:['005'] },
+};
+let teacherRows = [];
+let manageClasses = ['Class A','Class B','Class C','Class D','Class E'].map(n=>({
+  name:n, students:[]
+}));
+let assignable = [];
+let notifications = [
+  // Start empty - real-time notifications from database
+];
+
+// State
+let currentTeacher = null;
+let currentClass   = null;
+let verifyWay      = null;
+let currentParent  = null;
+let pickedKids     = new Set();
+let assignIdx      = 0;
+let stuPhotoOk=false, parPhotoOk=false, qrCode=null;
+
+// ═══════════════════════════════════════════════════════
+//  TEXT-TO-SPEECH (AI Voice Announcements)
+// ═══════════════════════════════════════════════════════
+function speak(text, voice = 'female') {
+  console.log('🔊 Speaking:', text);
+  
+  // Check if browser supports speech synthesis
+  if (!('speechSynthesis' in window)) {
+    console.warn('⚠️ Text-to-speech not supported in this browser');
+    return;
+  }
+  
+  // Cancel any ongoing speech
+  window.speechSynthesis.cancel();
+  
+  // Create speech utterance
+  const utterance = new SpeechSynthesisUtterance(text);
+  
+  // Configure voice settings
+  utterance.rate = 0.9; // Speed (0.1 to 10)
+  utterance.pitch = 1.0; // Pitch (0 to 2)
+  utterance.volume = 1.0; // Volume (0 to 1)
+  utterance.lang = 'en-US'; // Language
+  
+  // Get available voices and select preferred one
+  const voices = window.speechSynthesis.getVoices();
+  
+  // Try to find a good voice
+  if (voices.length > 0) {
+    // Prefer Google voices or female voices
+    const preferredVoice = voices.find(v => 
+      v.name.includes('Google') || 
+      v.name.includes('Female') || 
+      v.name.includes('Samantha') ||
+      v.name.includes('Victoria')
+    );
+    
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+      console.log('🎤 Using voice:', preferredVoice.name);
+    }
+  }
+  
+  // Error handling
+  utterance.onerror = (e) => console.error('Speech error:', e);
+  
+  // Speak!
+  window.speechSynthesis.speak(utterance);
+}
+
+// Make sure voices are loaded (some browsers need this)
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    console.log('🎤 Voices loaded:', window.speechSynthesis.getVoices().length);
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+//  SUPABASE HELPERS
+// ═══════════════════════════════════════════════════════
+async function loadStudents() {
+  try {
+    const { data, error } = await supabase.from('students').select('*')
+    if (error) throw error
+    if (data && data.length > 0) {
+      // Replace demo data with real data from database
+      STUDENTS.length = 0
+      STUDENTS.push(...data.map(s => ({
+        id: s.student_code || s.id,
+        name: s.name,
+        grade: s.grade,
+        cls: s.class || 'Unassigned',
+        photo: s.photo_url || '👤',
+        pid: s.parent_id
+      })))
+      
+      // Rebuild CLASS_STUDENTS from loaded data
+      CLASS_STUDENTS['Class A'] = STUDENTS.filter(s=>s.cls==='Class A').map(s=>({...s,present:true}));
+      CLASS_STUDENTS['Class B'] = STUDENTS.filter(s=>s.cls==='Class B').map(s=>({...s,present:true}));
+      CLASS_STUDENTS['Class C'] = STUDENTS.filter(s=>s.cls==='Class C').map(s=>({...s,present:true}));
+      CLASS_STUDENTS['Class D'] = STUDENTS.filter(s=>s.cls==='Class D').map(s=>({...s,present:true}));
+      CLASS_STUDENTS['Class E'] = STUDENTS.filter(s=>s.cls==='Class E').map(s=>({...s,present:true}));
+      
+      // Update assignable array
+      assignable.length = 0;
+      assignable.push(...STUDENTS.map(s=>({...s,sel:false})));
+      
+      console.log('✅ Loaded', STUDENTS.length, 'students from database');
+      console.log('📊 Class A:', CLASS_STUDENTS['Class A'].length, 'students');
+      console.log('📊 Class B:', CLASS_STUDENTS['Class B'].length, 'students');
+      console.log('📊 Class C:', CLASS_STUDENTS['Class C'].length, 'students');
+    } else {
+      console.log('ℹ️ No students in database yet');
+    }
+  } catch (err) {
+    console.log('⚠️ Using demo data:', err.message)
+  }
+}
+
+async function saveStudent(studentData) {
+  try {
+    const { data, error } = await supabase.from('students').insert([{
+      name: studentData.name,
+      grade: studentData.grade,
+      class: studentData.cls,
+      student_code: studentData.id,
+      qr_code: studentData.qrCode,
+      photo_url: studentData.photo,
+      parent_id: null
+    }]).select()
+    
+    if (error) throw error
+    toast('✅ Student saved to database!')
+    return data[0]
+  } catch (err) {
+    toast('⚠️ Saved locally: ' + err.message)
+    return null
+  }
+}
+
+async function loadTeachers() {
+  try {
+    const { data, error } = await supabase.from('teachers').select('*')
+    if (error) throw error
+    if (data && data.length > 0) {
+      teacherRows.length = 0
+      teacherRows.push(...data.map(t => ({
+        name: t.name,
+        user: t.username,
+        cls: t.class || 'Unassigned'
+      })))
+      console.log('✅ Loaded', teacherRows.length, 'teachers from database')
+    }
+  } catch (err) {
+    console.log('Using demo teachers:', err.message)
+  }
+}
+
+async function saveTeacher(teacherData) {
+  try {
+    const { data, error } = await supabase.from('teachers').insert([{
+      name: teacherData.name,
+      username: teacherData.username,
+      class: teacherData.cls
+    }]).select()
+    
+    if (error) throw error
+    toast('✅ Teacher saved to database!')
+    return data[0]
+  } catch (err) {
+    toast('⚠️ Saved locally: ' + err.message)
+    return null
+  }
+}
+
+async function updateStudentClass(studentId, className) {
+  try {
+    // Try updating by student_code first
+    let { error, count } = await supabase
+      .from('students')
+      .update({ class: className })
+      .eq('student_code', studentId)
+    
+    // If no rows updated, try by id
+    if (count === 0 || error) {
+      const result = await supabase
+        .from('students')
+        .update({ class: className })
+        .eq('id', studentId)
+      error = result.error
+      count = result.count
+    }
+    
+    if (error) throw error
+    console.log('✅ Updated student', studentId, 'to class', className)
+    return true
+  } catch (err) {
+    console.error('❌ Failed to update student class:', studentId, err.message)
+    toast('⚠️ Could not update student class in database')
+    return false
+  }
+}
+
+// ═════════════════════════════════════════════════════════
+//  REAL-TIME PICKUP REQUESTS
+// ═════════════════════════════════════════════════════════
+async function loadPickupRequests() {
+  try {
+    const { data, error } = await supabase
+      .from('pickup_requests')
+      .select('*')
+      .eq('status', 'pending')
+    
+    if (error) throw error
+    if (data) {
+      notifications.length = 0
+      notifications.push(...data.map(r => ({
+        id: r.id,
+        sName: r.student_name,
+        pName: r.parent_name,
+        cls: r.class,
+        time: new Date(r.created_at).toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'}),
+        done: false
+      })))
+      console.log('✅ Loaded', notifications.length, 'pickup requests')
+    }
+  } catch (err) {
+    console.log('No pickup requests:', err.message)
+  }
+}
+
+async function createPickupRequest(studentId, studentName, parentName, className) {
+  console.log('📝 Creating pickup request:', {studentId, studentName, parentName, className});
+  try {
+    const { data, error } = await supabase
+      .from('pickup_requests')
+      .insert([{
+        student_id: studentId,
+        student_name: studentName,
+        parent_name: parentName,
+        class: className,
+        status: 'pending',
+        verify_method: verifyWay
+      }])
+      .select()
+    
+    if (error) {
+      console.error('❌ Database error:', error);
+      throw error;
+    }
+    console.log('✅ Pickup request created in database:', data[0]);
+    return data[0]
+  } catch (err) {
+    console.error('❌ Failed to create pickup request:', err.message);
+    toast('⚠️ Failed to save pickup request: ' + err.message)
+    return null
+  }
+}
+
+async function updatePickupRequest(id, status) {
+  try {
+    const { error } = await supabase
+      .from('pickup_requests')
+      .update({ status })
+      .eq('id', id)
+    
+    if (error) throw error
+    console.log('✅ Pickup request updated:', id, status)
+  } catch (err) {
+    console.error('Failed to update pickup request:', err)
+  }
+}
+
+// Real-time subscription for classroom
+let pickupSubscription = null;
+
+function subscribeToPickupRequests(className) {
+  console.log('🎧 Setting up real-time subscription for:', className);
+  
+  // Unsubscribe from previous if exists
+  if (pickupSubscription) {
+    console.log('🔇 Removing old subscription');
+    supabase.removeChannel(pickupSubscription)
+  }
+
+  // Subscribe to new inserts for this class
+  pickupSubscription = supabase
+    .channel('pickup-requests-' + className)
+    .on('postgres_changes', 
+      { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'pickup_requests',
+        filter: `class=eq.${className}`
+      }, 
+      (payload) => {
+        console.log('🔔 REAL-TIME EVENT RECEIVED!');
+        console.log('📦 Payload:', payload);
+        console.log('📦 New row:', payload.new);
+        
+        const newReq = {
+          id: payload.new.id,
+          sName: payload.new.student_name,
+          pName: payload.new.parent_name,
+          cls: payload.new.class,
+          time: new Date(payload.new.created_at).toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'}),
+          done: false
+        }
+        
+        console.log('➕ Adding notification:', newReq);
+        notifications.push(newReq)
+        
+        // 🔊 AI VOICE ANNOUNCEMENT
+        speak(`${newReq.sName}, please come to reception. ${newReq.pName} is here to pick you up.`);
+        
+        // Re-render classroom if we're on that screen
+        if (cur === 'S-cls-device') {
+          console.log('🔄 Re-rendering classroom...');
+          renderClassroom()
+        }
+        
+        toast('🔔 New pickup request for ' + newReq.sName)
+      }
+    )
+    .subscribe((status) => {
+      console.log('📡 Subscription status:', status);
+      if (status === 'SUBSCRIBED') {
+        console.log('✅ Successfully subscribed to pickup requests for ' + className);
+      } else if (status === 'CHANNEL_ERROR') {
+        console.error('❌ Failed to subscribe to real-time channel');
+      }
+    })
+  
+  console.log('👂 Listening for pickup requests in', className)
+}
+
+function unsubscribeFromPickupRequests() {
+  if (pickupSubscription) {
+    supabase.removeChannel(pickupSubscription)
+    pickupSubscription = null
+    console.log('🔇 Stopped listening for pickup requests')
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  ROUTER  — dead simple show/hide
+// ═══════════════════════════════════════════════════════
+let stack = [];
+let cur   = 'S-home';
+
+function go(id, addHistory=true) {
+  const prev = document.getElementById(cur);
+  const next = document.getElementById(id);
+  if (!next) { console.error('Screen missing:', id); return; }
+  if (addHistory && cur !== id) stack.push(cur);
+  if (prev) prev.classList.remove('active');
+  next.classList.add('active');
+  next.scrollTop = 0;
+  cur = id;
+  setup(id);
+}
+
+function back() {
+  if (!stack.length) { go('S-home', false); return; }
+  const prev = stack.pop();
+  const curr = document.getElementById(cur);
+  const dest = document.getElementById(prev);
+  if (curr) curr.classList.remove('active');
+  if (dest) dest.classList.add('active');
+  cur = prev;
+  setup(prev);
+}
+
+// Make functions available globally for onclick handlers
+window.go = go;
+window.back = back;
+
+// ═══════════════════════════════════════════════════════
+//  TOPBAR SETUP
+// ═══════════════════════════════════════════════════════
+function setup(id) {
+  const tb  = document.getElementById('topbar');
+  const bk  = document.getElementById('btnBack');
+  const out = document.getElementById('btnOut');
+  const ttl = document.getElementById('tbTitle');
+
+  // Home: no topbar
+  if (id === 'S-home') { tb.classList.add('off'); return; }
+  tb.classList.remove('off');
+
+  const noBack  = new Set(['S-admin','S-reception']);
+  const showOut = new Set(['S-admin','S-reception','S-cls-device','S-cls-select']);
+  bk.className  = 'tb-btn' + (noBack.has(id) ? ' hide' : '');
+  out.className = 'tb-btn' + (showOut.has(id) ? '' : ' hide');
+
+  const titles = {
+    'S-login':'Staff Login','S-admin':'Admin Dashboard','S-reception':'Reception Dashboard',
+    'S-cls-login':'Classroom Login','S-cls-select':'Select Classroom',
+    'S-cls-device': currentClass || 'Classroom',
+    'S-verify':'Verify Identity','S-pickup':'Parent Pickup',
+    'S-addteacher':'Add Teacher','S-teachers':'All Teachers',
+    'S-classes':'Manage Classes','S-assign':'Assign Students',
+    'S-addstudent':'Add Student','S-students':'All Students','S-editstu':'Edit Student',
+  };
+  ttl.textContent = titles[id] || '';
+
+  // Render dynamic content
+  if (id==='S-cls-select')  {
+    loadStudents().then(() => renderClsList());
+  }
+  if (id==='S-cls-device')  { 
+    loadPickupRequests().then(() => {
+      renderClassroom();
+      subscribeToPickupRequests(currentClass);
+    });
+  }
+  if (id==='S-pickup')      {
+    loadStudents().then(() => renderPickup());
+  }
+  if (id==='S-teachers')    renderTeachers();
+  if (id==='S-classes')     renderManageClasses();
+  if (id==='S-assign')      renderAssign();
+  if (id==='S-students')    {
+    loadStudents().then(() => renderStudents());
+  }
+  if (id==='S-addstudent')  resetStuForm();
+}
+
+document.getElementById('btnBack').onclick = back;
+document.getElementById('btnOut').onclick = () => {
+  unsubscribeFromPickupRequests();
+  stack = [];
+  currentTeacher = null;
+  go('S-home', false);
+  toast('Logged out');
+};
+
+// ═══════════════════════════════════════════════════════
+//  TOAST & MODAL
+// ═══════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('off');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add('off'), 2500);
+}
+function showModal(title, body, btns=[]) {
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mBody').innerHTML = body;
+  const f = document.getElementById('mFoot');
+  f.innerHTML = '';
+  btns.forEach(b => f.appendChild(b));
+  document.getElementById('modal').classList.remove('off');
+}
+function closeModal() { document.getElementById('modal').classList.add('off'); }
+function mBtn(txt, fn) {
+  const b = document.createElement('button');
+  b.textContent = txt; b.onclick = fn; return b;
+}
+document.getElementById('mBg').onclick = closeModal;
+
+// Make available globally
+window.toast = toast;
+window.showModal = showModal;
+window.closeModal = closeModal;
+window.speak = speak; // Make voice announcement available globally
+
+// ═══════════════════════════════════════════════════════
+//  STAFF LOGIN
+// ═══════════════════════════════════════════════════════
+let spVisible = false;
+document.getElementById('sp-eye').onclick = () => {
+  spVisible = !spVisible;
+  document.getElementById('sp').type = spVisible ? 'text' : 'password';
+};
+document.getElementById('sp').addEventListener('keypress', e => { if(e.key==='Enter') document.getElementById('btn-slogin').click(); });
+document.getElementById('btn-slogin').onclick = () => {
+  const u = document.getElementById('su').value.trim();
+  const p = document.getElementById('sp').value.trim();
+  if (!u || !p) return toast('⚠️ Enter username and password');
+  const usr = STAFF[u];
+  if (!usr || usr.pw !== p) return toast('❌ Invalid credentials');
+  toast('✅ Welcome, ' + usr.label + '!');
+  stack = [];
+  go(usr.role === 'admin' ? 'S-admin' : 'S-reception', false);
+};
+
+// ═══════════════════════════════════════════════════════
+//  CLASSROOM LOGIN
+// ═══════════════════════════════════════════════════════
+let cpVisible = false;
+document.getElementById('cp-eye').onclick = () => {
+  cpVisible = !cpVisible;
+  document.getElementById('cp').type = cpVisible ? 'text' : 'password';
+};
+document.getElementById('cp').addEventListener('keypress', e => { if(e.key==='Enter') document.getElementById('btn-clogin').click(); });
+document.getElementById('btn-clogin').onclick = () => {
+  const u = document.getElementById('cu').value.trim();
+  const p = document.getElementById('cp').value.trim();
+  if (!u || !p) return toast('⚠️ Enter username and password');
+  const t = TEACHERS[u];
+  if (!t || t.pw !== p) return toast('❌ Invalid teacher credentials');
+  currentTeacher = { ...t, user: u };
+  document.getElementById('welcomeMsg').textContent = 'Welcome, ' + t.name + '!';
+  toast('✅ Welcome, ' + t.name + '!');
+  go('S-cls-select');
+};
+
+// ═══════════════════════════════════════════════════════
+//  CLASSROOM SELECT
+// ═══════════════════════════════════════════════════════
+function renderClsList() {
+  const w = document.getElementById('clsList');
+  w.innerHTML = '';
+  ['Class A','Class B','Class C','Class D','Class E'].forEach(cls => {
+    const cnt = (CLASS_STUDENTS[cls] || []).length;
+    const d = document.createElement('div');
+    d.className = 'li';
+    d.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="bubble b-g">${cls.split(' ')[1]}</div>
+        <div>
+          <div class="li-title">${cls}</div>
+          <div class="li-sub">${cnt} student${cnt !== 1 ? 's' : ''}</div>
+        </div>
+      </div>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
+    d.onclick = () => { currentClass = cls; go('S-cls-device'); };
+    w.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  CLASSROOM DEVICE — students LEFT, notifications RIGHT
+// ═══════════════════════════════════════════════════════
+function renderClassroom() {
+  const sList = CLASS_STUDENTS[currentClass] || [];
+  document.getElementById('stuCount').textContent = sList.length + ' students';
+
+  // LEFT: student rows with photo
+  const sl = document.getElementById('stuList');
+  sl.innerHTML = '';
+  if (!sList.length) {
+    sl.innerHTML = '<div class="empty"><div class="empty-t">No students in this class</div></div>';
+  } else {
+    sList.forEach(s => {
+      const d = document.createElement('div');
+      d.className = 'stu';
+      d.innerHTML = `
+        <div class="stu-pic">${s.photo}</div>
+        <div style="flex:1">
+          <div class="stu-name">${s.name}</div>
+          <div class="stu-sub">${s.grade} &nbsp;·&nbsp; ID: ${s.id}</div>
+        </div>
+        <div class="badge ${s.present ? 'b-pres' : 'b-abs'}">${s.present ? '✓ Present' : '✗ Absent'}</div>`;
+      sl.appendChild(d);
+    });
+  }
+
+  // RIGHT: pickup requests
+  const pending = notifications.filter(n => !n.done && n.cls === currentClass);
+  document.getElementById('reqCount').textContent = pending.length + ' pending';
+  const rl = document.getElementById('reqList');
+  rl.innerHTML = '';
+  if (!pending.length) {
+    rl.innerHTML = `<div class="empty">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="empty-t">No pickup requests</div>
+      <div class="empty-s">Waiting for parents…</div>
+    </div>`;
+    return;
+  }
+  pending.forEach(n => {
+    const c = document.createElement('div');
+    c.className = 'req';
+    c.innerHTML = `
+      <div class="req-top"><div class="req-tag">PICKUP REQUEST</div><div class="req-time">${n.time}</div></div>
+      <div class="req-mid">
+        <div class="req-av"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><div class="req-sn">${n.sName}</div><div class="req-pn">Parent: ${n.pName}</div></div>
+      </div>
+      <div class="req-btns">
+        <button class="rb rb-a">✓ Accept</button>
+        <button class="rb rb-r">✗ Reject</button>
+      </div>`;
+    c.querySelector('.rb-a').onclick = () => handleReq(n.id, true);
+    c.querySelector('.rb-r').onclick = () => handleReq(n.id, false);
+    rl.appendChild(c);
+  });
+}
+
+function handleReq(id, accept) {
+  const n = notifications.find(x => x.id === id);
+  if (!n) return;
+  n.done = true;
+  
+  // Update database
+  updatePickupRequest(id, accept ? 'accepted' : 'rejected');
+  
+  toast(accept ? '✅ ' + n.sName + ' cleared for pickup' : '❌ Request rejected for ' + n.sName);
+  setTimeout(renderClassroom, 700);
+}
+
+// ═══════════════════════════════════════════════════════
+//  PARENT VERIFY
+// ═══════════════════════════════════════════════════════
+function scanModal(color, cb) {
+  showModal('Scanning…',
+    `<div style="display:flex;align-items:center;gap:14px;padding:10px 0">
+      <div style="width:34px;height:34px;border:3px solid ${color};border-top-color:transparent;border-radius:50%;animation:sp 1s linear infinite;flex-shrink:0"></div>
+      <div>Please wait…</div>
+    </div>
+    <style>@keyframes sp{to{transform:rotate(360deg)}}</style>`,
+    [mBtn('Cancel', closeModal)]
+  );
+  setTimeout(() => { closeModal(); cb(); }, 1800);
+}
+document.getElementById('btn-face').onclick = async () => {
+  scanModal('var(--blue)', async () => {
+    verifyWay = 'face'; 
+    currentParent = PARENTS['P1']; 
+    pickedKids.clear();
+    
+    // Load students FIRST, then go to pickup
+    console.log('🔄 Loading students before showing pickup...');
+    await loadStudents();
+    console.log('✅ Students loaded, now showing pickup screen');
+    
+    // Voice announcement for parent verification
+    speak(`Welcome ${currentParent.name}. Please select your children.`);
+    
+    go('S-pickup');
+  });
+};
+document.getElementById('btn-qr').onclick = async () => {
+  scanModal('var(--orange)', async () => {
+    verifyWay = 'qr'; 
+    currentParent = PARENTS['P1']; 
+    pickedKids.clear();
+    
+    // Load students FIRST, then go to pickup
+    console.log('🔄 Loading students before showing pickup...');
+    await loadStudents();
+    console.log('✅ Students loaded, now showing pickup screen');
+    
+    // Voice announcement for parent verification
+    speak(`Welcome ${currentParent.name}. Please select your children.`);
+    
+    go('S-pickup');
+  });
+};
+
+// ═══════════════════════════════════════════════════════
+//  PARENT PICKUP — kids with photos
+// ═══════════════════════════════════════════════════════
+function renderPickup() {
+  console.log('🔍 renderPickup called');
+  console.log('📊 STUDENTS array:', STUDENTS);
+  console.log('📊 Number of students:', STUDENTS.length);
+  
+  document.getElementById('pEmo').textContent  = currentParent.emo;
+  document.getElementById('pName').textContent = currentParent.name;
+  document.getElementById('pBadge').textContent = '✓ Verified via ' + (verifyWay === 'face' ? 'Face Scan' : 'QR Code');
+
+  // FOR TESTING: Show ALL students (not just parent's kids)
+  const kids = STUDENTS; // Show all students for testing
+  
+  console.log('👥 Kids to display:', kids.length);
+  
+  const w = document.getElementById('pickupCards');
+  w.innerHTML = '';
+  
+  if (!kids.length) {
+    console.log('⚠️ No students found - showing empty message');
+    w.innerHTML = '<div style="text-align:center;padding:36px;color:var(--dim)">No students in database yet. Add students first!<br><br>Current students: ' + STUDENTS.length + '</div>';
+    return;
+  }
+  
+  console.log('✅ Rendering', kids.length, 'student cards');
+  
+  kids.forEach(s => {
+    const sel = pickedKids.has(s.id);
+    const c = document.createElement('div');
+    c.className = 'pkcard' + (sel ? ' sel' : '');
+    c.innerHTML = `
+      <div class="pk-photo">${s.photo}</div>
+      <div class="pk-info">
+        <div class="pk-name">${s.name}</div>
+        <div class="pk-grade">${s.grade} &nbsp;·&nbsp; ${s.cls}</div>
+      </div>
+      <div class="pk-check">${sel ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>`;
+    c.onclick = () => {
+      sel ? pickedKids.delete(s.id) : pickedKids.add(s.id);
+      renderPickup();
+    };
+    w.appendChild(c);
+  });
+}
+document.getElementById('btn-confirm').onclick = async () => {
+  console.log('🎯 Confirm pickup clicked');
+  console.log('📋 Selected kids:', Array.from(pickedKids));
+  
+  if (!pickedKids.size) return toast('⚠️ Select at least one child');
+  
+  console.log('💾 Saving pickup requests to database...');
+  
+  // Save each pickup request to database
+  for (const id of pickedKids) {
+    const s = STUDENTS.find(x => x.id === id);
+    if (!s) {
+      console.warn('⚠️ Student not found:', id);
+      continue;
+    }
+    
+    console.log('👉 Creating request for:', s.name, 'in class', s.cls);
+    
+    // Create pickup request in database (this will trigger real-time notification)
+    const result = await createPickupRequest(s.id, s.name, currentParent.name, s.cls);
+    
+    if (result) {
+      console.log('✅ Request saved for', s.name);
+    } else {
+      console.error('❌ Failed to save request for', s.name);
+    }
+  }
+  
+  toast('✅ Pickup request sent for ' + pickedKids.size + ' child' + (pickedKids.size > 1 ? 'ren' : ''));
+  pickedKids.clear();
+  setTimeout(() => { stack = []; go('S-home', false); }, 1500);
+};
+
+// ═══════════════════════════════════════════════════════
+//  TEACHERS
+// ═══════════════════════════════════════════════════════
+let tPhotoOk = false;
+document.getElementById('tPhoto').onclick = () => {
+  tPhotoOk = true;
+  document.getElementById('tPhoto').style.background = 'var(--gp)';
+  document.getElementById('tPhotoLbl').textContent = '✓ Photo taken';
+  toast('📷 Photo captured!');
+};
+document.getElementById('btn-saveteacher').onclick = async () => {
+  const n = document.getElementById('tName').value.trim();
+  const u = document.getElementById('tUser').value.trim();
+  const p = document.getElementById('tPass').value.trim();
+  if (!n || !u || !p) return toast('⚠️ Fill all fields');
+  
+  const newTeacher = { name: n, username: u, cls: 'Unassigned' };
+  
+  // Save to Supabase
+  await saveTeacher(newTeacher);
+  
+  // Reload teachers from database
+  await loadTeachers();
+  
+  // Update local TEACHERS object for login AND save to localStorage
+  TEACHERS[u] = { pw: p, name: n, cls: 'Unassigned' };
+  saveTeacherCredentials(); // ← Save to localStorage so it persists after reload
+  
+  tPhotoOk = false;
+  document.getElementById('tPhoto').style.background = '';
+  document.getElementById('tPhotoLbl').textContent = 'Tap to capture';
+  document.getElementById('tName').value = '';
+  document.getElementById('tUser').value = '';
+  document.getElementById('tPass').value = '';
+  back();
+};
+function renderTeachers() {
+  const w = document.getElementById('teacherList');
+  w.innerHTML = '';
+  if (!teacherRows.length) { w.innerHTML = '<div style="padding:36px;text-align:center;color:var(--dim)">No teachers yet</div>'; return; }
+  teacherRows.forEach(t => {
+    const d = document.createElement('div');
+    d.className = 'li';
+    d.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="bubble b-b"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><div class="li-title">${t.name}</div><div class="li-sub">@${t.user} &nbsp;·&nbsp; ${t.cls}</div></div>
+      </div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`;
+    w.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  MANAGE CLASSES
+// ═══════════════════════════════════════════════════════
+document.getElementById('btn-addcls').onclick = () => {
+  showModal('Add New Class',
+    `<label style="display:flex;flex-direction:column;gap:7px;font-size:11px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:.07em">
+      Class Name
+      <input id="ncn" placeholder="e.g. Class F" style="padding:12px 14px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;font-family:Manrope,sans-serif"/>
+    </label>`,
+    [
+      mBtn('Cancel', closeModal),
+      mBtn('Add Class', () => {
+        const v = document.getElementById('ncn')?.value.trim();
+        if (!v) return toast('⚠️ Enter a class name');
+        manageClasses.push({ name:v, students:[] });
+        closeModal();
+        toast('✅ ' + v + ' added!');
+        renderManageClasses();
+      })
+    ]
+  );
+  setTimeout(() => document.getElementById('ncn')?.focus(), 60);
+};
+function renderManageClasses() {
+  const w = document.getElementById('clsManage');
+  w.innerHTML = '';
+  manageClasses.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'li';
+    d.innerHTML = `
+      <div>
+        <div class="li-title">${c.name}</div>
+        <div class="li-sub">${c.students.length} student${c.students.length !== 1 ? 's' : ''}</div>
+      </div>
+      <button class="sm-btn">Assign</button>`;
+    d.querySelector('button').onclick = e => {
+      e.stopPropagation();
+      assignIdx = i;
+      assignable.forEach(s => s.sel = false);
+      go('S-assign');
+    };
+    w.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  ASSIGN STUDENTS
+// ═══════════════════════════════════════════════════════
+function renderAssign() {
+  const cls = manageClasses[assignIdx];
+  document.getElementById('assignTitle').textContent = 'Assign – ' + cls.name;
+  const w = document.getElementById('assignList');
+  w.innerHTML = '';
+  document.getElementById('assignCount').textContent = assignable.filter(s=>s.sel).length + ' selected';
+  assignable.forEach(s => {
+    const d = document.createElement('div');
+    d.className = 'li';
+    d.style.border = s.sel ? '2px solid var(--green)' : '2px solid transparent';
+    d.innerHTML = `
+      <div>
+        <div class="li-title">${s.name}</div>
+        <div class="li-sub">${s.grade} &nbsp;·&nbsp; ID: ${s.id}</div>
+      </div>
+      <div class="badge ${s.sel ? 'b-pres' : ''}" style="${s.sel ? '' : 'background:rgba(90,120,170,.12);color:var(--dim)'}">${s.sel ? '✓ Selected' : 'Select'}</div>`;
+    d.onclick = () => { s.sel = !s.sel; renderAssign(); };
+    w.appendChild(d);
+  });
+  document.getElementById('btn-saveassign').onclick = async () => {
+    const cls = manageClasses[assignIdx];
+    const selected = assignable.filter(s=>s.sel);
+    
+    // Update each student's class in the database
+    for (const student of selected) {
+      await updateStudentClass(student.id, cls.name);
+      // Also update local STUDENTS array
+      const localStudent = STUDENTS.find(s => s.id === student.id);
+      if (localStudent) {
+        localStudent.cls = cls.name;
+      }
+    }
+    
+    // Reload students from database to get updated assignments
+    await loadStudents();
+    
+    // Update manageClasses
+    manageClasses[assignIdx].students = selected.map(s=>s.name);
+    
+    toast('✅ ' + selected.length + ' student' + (selected.length!==1?'s':'') + ' assigned to ' + cls.name);
+    back();
+    renderManageClasses();
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+//  ADD STUDENT
+// ═══════════════════════════════════════════════════════
+function resetStuForm() {
+  stuPhotoOk = parPhotoOk = false; qrCode = null;
+  ['stN','stG','stI','stF','stM'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const qs = document.getElementById('qrStatus'); if(qs) qs.textContent='';
+  const sp = document.getElementById('sPhoto'), pp = document.getElementById('parPhoto');
+  if(sp){ sp.classList.remove('done'); document.getElementById('sPhotoLbl').textContent='Student Photo'; }
+  if(pp){ pp.classList.remove('done'); document.getElementById('parPhotoLbl').textContent='Parent Photo'; }
+}
+document.getElementById('sPhoto').onclick = () => {
+  stuPhotoOk = true;
+  document.getElementById('sPhoto').classList.add('done');
+  document.getElementById('sPhotoLbl').textContent = '✓ Captured';
+  toast('📷 Student photo captured!');
+};
+document.getElementById('parPhoto').onclick = () => {
+  parPhotoOk = true;
+  document.getElementById('parPhoto').classList.add('done');
+  document.getElementById('parPhotoLbl').textContent = '✓ Captured';
+  toast('📷 Parent photo captured!');
+};
+document.getElementById('btn-genqr').onclick = () => {
+  const id = document.getElementById('stI').value.trim();
+  if (!id) return toast('⚠️ Enter Student ID first');
+  qrCode = 'STU_' + id + '_' + Date.now();
+  document.getElementById('qrStatus').textContent = '✓ QR Generated: ' + qrCode;
+  toast('✅ QR code generated!');
+};
+document.getElementById('btn-savestu').onclick = async () => {
+  const n=document.getElementById('stN').value.trim(), g=document.getElementById('stG').value.trim();
+  const i=document.getElementById('stI').value.trim(), f=document.getElementById('stF').value.trim();
+  const m=document.getElementById('stM').value.trim();
+  if(!n||!g||!i||!f||!m) return toast('⚠️ Fill all fields');
+  if(!stuPhotoOk) return toast('⚠️ Capture student photo first');
+  if(!parPhotoOk) return toast('⚠️ Capture parent photo first');
+  if(!qrCode)     return toast('⚠️ Generate QR code first');
+  
+  const newStudent = {
+    id: i,
+    name: n,
+    grade: g,
+    cls: 'Unassigned',
+    photo: '👤',
+    pid: '',
+    qrCode: qrCode
+  };
+  
+  // Save to Supabase
+  await saveStudent(newStudent);
+  
+  // Reload students from database
+  await loadStudents();
+  
+  back();
+};
+
+// ═══════════════════════════════════════════════════════
+//  VIEW STUDENTS
+// ═══════════════════════════════════════════════════════
+function renderStudents() {
+  const w = document.getElementById('stuAllList');
+  w.innerHTML = '';
+  if (!STUDENTS.length) { w.innerHTML = '<div style="padding:36px;text-align:center;color:var(--dim)">No students yet</div>'; return; }
+  STUDENTS.forEach(s => {
+    const d = document.createElement('div');
+    d.className = 'li';
+    d.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:50px;height:50px;border-radius:50%;background:var(--card2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px">${s.photo}</div>
+        <div><div class="li-title">${s.name}</div><div class="li-sub">${s.grade} &nbsp;·&nbsp; ${s.cls}</div></div>
+      </div>
+      <button class="sm-btn" style="background:rgba(90,120,170,.14);color:var(--text)">Regen QR</button>`;
+    d.querySelector('button').onclick = e => {
+      e.stopPropagation();
+      showModal('QR Code – ' + s.name,
+        `<div style="text-align:center;padding:8px 0">
+          <div style="font-size:68px;line-height:1.2;margin-bottom:12px">▪▫▪<br>▫▪▫<br>▪▫▪</div>
+          <div style="font-family:monospace;font-size:11px;word-break:break-all;color:var(--dim)">STUDENT_${s.id}_${Date.now()}</div>
+          <div style="font-size:12px;color:var(--dim);margin-top:8px">Ready to print</div>
+        </div>`,
+        [mBtn('Close', closeModal), mBtn('Print', () => { closeModal(); toast('🖨️ Printing…'); })]
+      );
+    };
+    w.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  MISC
+// ═══════════════════════════════════════════════════════
+document.getElementById('btnPrintQr').onclick = () => toast('🖨️ Printing QR codes for all students…');
+document.getElementById('btn-scanqr').onclick  = () => toast('📱 QR scanner — demo mode');
+document.getElementById('btn-faceedit').onclick = () => toast('📷 Face scanner — demo mode');
+
+// ═══════════════════════════════════════════════════════
+//  START
+// ═══════════════════════════════════════════════════════
+// Load data from database
+loadStudents();
+loadTeachers();
+
+// Home is already .active — just run setup for topbar
+setup('S-home');
+</script>
+</body>
+</html>
